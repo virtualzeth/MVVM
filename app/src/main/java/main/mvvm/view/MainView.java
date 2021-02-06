@@ -14,7 +14,7 @@ public class MainView extends AppCompatActivity {
     private final HeaderModel headerModel = new HeaderModel();
 
     private TextView header;
-    private EditText editText;
+    private EditText editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,15 +22,22 @@ public class MainView extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         header = (TextView) findViewById(R.id.header);
-        editText = (EditText) findViewById(R.id.editText);
+        editor = (EditText) findViewById(R.id.editor);
 
-        header.setText(headerModel.getText());
-        editText.setText(headerModel.getText());
+        observer(headerModel);
+
+        editor.setText(headerModel.getText());
+    }
+
+    private void observer(HeaderModel headerModel) {
+        headerModel.addObserver((o, arg) -> {
+            String text = ((HeaderModel) o).getText();
+            header.setText(text);
+        });
     }
 
     public void editText(View view) {
-        String text = editText.getText().toString();
+        String text = editor.getText().toString();
         headerModel.setText(text);
-        header.setText(text);
     }
 }

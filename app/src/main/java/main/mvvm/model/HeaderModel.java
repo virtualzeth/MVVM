@@ -1,6 +1,8 @@
 package main.mvvm.model;
 
-public class HeaderModel {
+import java.util.Observable;
+
+public class HeaderModel extends Observable {
     private String text;
 
     public HeaderModel() {
@@ -11,7 +13,9 @@ public class HeaderModel {
         return text;
     }
 
-    public void setText(String header) {
-        this.text = header;
+    public void setText(String text) {
+        this.text = text;
+        super.setChanged();
+        super.notifyObservers();
     }
 }
