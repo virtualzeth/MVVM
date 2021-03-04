@@ -1,6 +1,8 @@
 package main.mvvm.view;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,36 +10,34 @@ import android.widget.*;
 
 import main.mvvm.R;
 
-import main.mvvm.model.HeaderModel;
-
 public class MainView extends AppCompatActivity {
-    private final HeaderModel headerModel = new HeaderModel();
-
-    private TextView header;
-    private EditText editor;
+    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        header = (TextView) findViewById(R.id.header);
-        editor = (EditText) findViewById(R.id.editor);
+        initializeObservers();
 
-        observer(headerModel);
-
-        editor.setText(headerModel.getText());
+        EditText inputField = findViewById(R.id.inputField);
+        inputField.setText(mainViewModel.getHeaderMutableLiveData().getValue());
     }
 
-    private void observer(HeaderModel headerModel) {
-        headerModel.addObserver((o, arg) -> {
-            String text = ((HeaderModel) o).getText();
+    private void initializeObservers() {
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        final Observer<String> headerObserver = text -> {
+            TextView header = findViewById(R.id.header);
             header.setText(text);
-        });
+        };
+
+        mainViewModel.getHeaderMutableLiveData().observe(this, headerObserver);
     }
 
     public void editText(View view) {
-        String text = editor.getText().toString();
-        headerModel.setText(text);
+        EditText inputField = findViewById(R.id.inputField);
+        String text = inputField.getText().toString();
+        mainViewModel.setHeader(text);
     }
 }
