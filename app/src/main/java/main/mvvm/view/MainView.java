@@ -1,43 +1,36 @@
 package main.mvvm.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
 import main.mvvm.R;
+import main.mvvm.viewModel.MainViewModel;
 
 public class MainView extends AppCompatActivity {
-    private MainViewModel mainViewModel;
+    private final MainViewModel mainViewModel = new MainViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initializeObservers();
-
-        EditText inputField = findViewById(R.id.inputField);
-        inputField.setText(mainViewModel.getHeaderMutableLiveData().getValue());
+        observeMainViewModel();
     }
 
-    private void initializeObservers() {
-        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-
-        final Observer<String> headerObserver = text -> {
-            TextView header = findViewById(R.id.header);
-            header.setText(text);
-        };
-
-        mainViewModel.getHeaderMutableLiveData().observe(this, headerObserver);
+    private void observeMainViewModel() {
+        mainViewModel.addObserver((o, arg) -> {
+            String header = ((MainViewModel) o).getHeader();
+            TextView headerTextView = findViewById(R.id.header);
+            headerTextView.setText(header);
+        });
     }
 
     public void editText(View view) {
         EditText inputField = findViewById(R.id.inputField);
-        String text = inputField.getText().toString();
-        mainViewModel.setHeader(text);
+        String input = inputField.getText().toString();
+        mainViewModel.setHeader((!input.equals("")) ? input : " ");
     }
 }
