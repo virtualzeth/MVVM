@@ -17,7 +17,7 @@ public class DatabaseHandlerTest {
 
     @Test
     public void checkForConnection() {
-        String URI = "mongodb+srv://root:VerySafePassword1234@cluster0.pwpxt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+        String URI = String.format("mongodb+srv://root:%s@cluster0.pwpxt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", new Env().PASSWORD);
         Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
 
         ConnectionString connectionString = new ConnectionString(URI);
