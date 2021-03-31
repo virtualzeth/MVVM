@@ -3,11 +3,7 @@ package main.mvvm.model;
 import java.util.Observable;
 
 public class MainModel extends Observable {
-    private String headerText;
-
-    public MainModel() {
-        this.headerText = "Welcome";
-    }
+    private String headerText = "welcome";
 
     public String getHeader() {
         return headerText;
@@ -15,6 +11,7 @@ public class MainModel extends Observable {
 
     public void setHeader(String text) {
         this.headerText = text;
+
         super.setChanged();
         super.notifyObservers();
     }

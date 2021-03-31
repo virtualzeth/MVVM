@@ -1,29 +1,49 @@
 package main.mvvm.persistance;
 
-import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.client.*;
+import androidx.annotation.Nullable;
 
-import org.bson.Document;
+public class DatabaseHandler extends SQLiteOpenHelper {
+    private final Context context;
 
-import java.util.logging.*;
+    public DatabaseHandler(@Nullable Context context) {
+        super(context, "MVVM", null, 1);
+        this.context = context;
+    }
 
-import main.mvvm.Env;
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String query = "CREATE TABLE header (id TEXT PRIMARY KEY AUTOINCREMENT, text TEXT);";
+        db.execSQL(query);
+    }
 
-public class DatabaseHandler {
-    @SuppressLint("AuthLeak")
-    private final String URI = String.format("mongodb+srv://root:%s@cluster0.pwpxt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", new Env().PASSWORD);
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS header;");
+        onCreate(db);
+    }
+    public void insertHeader(String text) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("text", text);
 
-    public void qwe() {
-        Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
+        long result = db.insert("header", null, contentValues);
+        Toast.makeText(context, (result == -1) ? "Failed" : "Success" , Toast.LENGTH_SHORT).show();
+    }
+    public Cursor getHeaders() {
+        String query = "SELECT * FROM header";
+        SQLiteDatabase db = this.getReadableDatabase();
 
-        ConnectionString connectionString = new ConnectionString(this.URI);
-
-        try(MongoClient mongoClient = MongoClients.create(connectionString)) {
-            MongoCollection<Document> header = mongoClient.getDatabase("MVVM").getCollection("header");
-            Document document = new Document("header", "Welcome");
-            header.insertOne(document);
+        Cursor cursor = null;
+        if(db != null) {
+            cursor = db.rawQuery(query, null);
         }
+        return cursor;
     }
 }
